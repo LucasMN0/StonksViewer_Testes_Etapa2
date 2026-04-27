@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="../docs/imagens/cofrinho.png" type="image/png" />
+  <title>StonksViewer</title>
+  <link rel="stylesheet" href="perfil.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">Stonks Viewer</div>
+      </div>
+
+      <li class="lembretes-section">
+          <div class="lembretes-header">
+              <span>Lembretes: </span>
+                  <span class="lembrete-count" id="lembrete-count"> 0 </span>
+          </div>
+          <div class="lembretes-lista" id="lembretes-lista">
+                    
+          </div>
+      </li>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#main-charts">Análise</a></li>
+          <li><a href="#recent-transactions">Últimas movimentações</a></li>
+          <li><a href="#metas-financeiras">Metas</a></li>
+          <li><a href="#adicionar-lembrete">Adicionar lembretes</a></li>
+          <li><a href="../back-end/usuarios/templates/usuarios/metas.html">Metas financeiras</a></li>
+          <li><a href="index.html">Sair</a></li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-user-profile">
+        <div class="user-avatar"></div>
+        <div class="user-info">
+          <p class="user-name">Usuário Exemplo</p>
+          <p class="user-email">email@exemplo.com</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content" id="main-content">
+
+      <!-- CABEÇALHO -->
+      <header class="main-header">
+        <h1>Sua visão geral financeira</h1>
+      </header>
+
+      <!-- RESUMO -->
+      <section class="summary-cards">
+        <div class="card">
+          <h2>Saldo Atual</h2>
+          <p class="card-value" id="saldo-atual">R$ 0,00</p>
+        </div>
+        <div class="card">
+          <h2>Ganhos</h2>
+          <p class="card-value" id="total-ganhos">R$ 0,00</p>
+        </div>
+        <div class="card">
+          <h2>Gastos</h2>
+          <p class="card-value" id="total-gastos">R$ 0,00</p>
+        </div>
+      </section>
+
+      <!-- ADICIONAR LEMBRETE -->
+      <section class="adicionar-lembrete" id="adicionar-lembrete">
+        <h3>Adicionar Lembrete</h3>
+        <p style="font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-size: 13px;">Os lembretes ajudarão você a não esquecer de compromissos financeiros importantes.</p>
+        <br>
+        <form id="form-lembrete">
+
+          <input type="text" name="lembrete" placeholder="Nome" />
+          <input type="date" name="data-lembrete" placeholder="Data" />
+          <input type="text" name="descricao" placeholder="Descrição" />
+          <button type="button" onclick="adicionarLembrete()">Adicionar Lembrete</button>
+        </form>
+      </section>
+
+      <!-- ÚLTIMAS TRANSAÇÕES -->
+      <section class="recent-transactions" id="recent-transactions">
+        <h3>Últimas Movimentações</h3>
+        <div class="transaction-list-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Valor</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-transacoes">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- FORMULÁRIO DE NOVA TRANSAÇÃO -->
+      <section class="add-transaction-form">
+        <h3>Adicionar Nova Movimentação</h3>
+        <form id="add-transaction-form">
+          <input type="date" name="date" placeholder="Data" required />
+          <input type="text" name="description" placeholder="Descrição" required />
+          <input type="number" name="value" placeholder="Valor" step="0.01" required />
+          <select name="type" required>
+            <option value="income">Ganho fixo</option>
+            <option value="investment">Ganho extra</option>
+            <option value="expense">Gasto fixo</option>
+            <option value="extra">Gasto extra</option>
+            <option value="variable">Valor aplicado</option>
+            <option value="variable">Reserva de emergência</option>
+            <option value="variable">Meta financeira</option>
+            <option value="other">Outro</option>
+
+          </select>
+          <button type="submit">Adicionar</button>
+        </form>
+      </section>
+
+      <!-- GRÁFICOS -->
+    <section class="main-charts" id="main-charts">
+       <div class="charts-row">
+        <div class="chart-container">
+          <canvas id="graficoGastos"></canvas>
+        </div>
+        <div class="chart-container">
+          <canvas id="graficoSaldo"></canvas>
+        </div>
+      </div>
+    </section>
+
+      <!-- METAS FINANCEIRAS -->
+      <section class="metas-financeiras" id="metas-financeiras">
+        <h3>Metas Financeiras</h3>
+        <p style="font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; font-size: 13px;" > Defina suas metas principais e acompanhe seus progressos.</p>
+        <br>
+        <form id="adicionar-meta">
+          <input type="text" name="meta" placeholder="Nome da meta" required />
+          <input type="number" name="valor-meta" placeholder="Valor da meta" step="0.01" required />
+          <button type="submit">Adicionar Meta</button>
+        </form>
+
+        <div class="meta-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Meta</th>
+                <th>Valor atual / Meta</th>
+                <th>Progresso</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-metas">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <script>
+        const formTransacoes = document.getElementById("add-transaction-form");
+        const tabelaTransacoes = document.getElementById("tabela-transacoes");
+
+        function carregarTransacoes() {
+            const transacoes = JSON.parse(localStorage.getItem('transacoes') || '[]');
+            tabelaTransacoes.innerHTML = '';
+            
+            transacoes.forEach(transacao => {
+                adicionarLinhaTransacao(transacao);
+            });
+            
+            atualizarResumoFinanceiro();
+        }
+
+        function adicionarLinhaTransacao(transacao) {
+            const novaLinha = document.createElement("tr");
+            novaLinha.dataset.id = transacao.id;
+            const tdData = document.createElement("td");
+            const tdDescricao = document.createElement("td");
+            const tdCategoria = document.createElement("td");
+            const tdValor = document.createElement("td");
+            const tdAcoes = document.createElement("td");
+
+            tdData.textContent = transacao.data;
+            tdDescricao.textContent = transacao.descricao;
+
+            let categoria = "";
+            switch (transacao.tipo) {
+                case "expense": categoria = "Gasto fixo"; break;
+                case "extra": categoria = "Gasto extra"; break;
+                case "income": categoria = "Ganho fixo"; break;
+                case "investment": categoria = "Ganho extra"; break;
+                case "other": categoria = "Outro"; break;
+            }
+            tdCategoria.textContent = categoria;
+
+            tdValor.textContent = `R$ ${parseFloat(transacao.valor).toFixed(2)}`;
+            tdValor.style.color = (transacao.tipo === "income" || transacao.tipo === "investment") ? "green" : "red";
+            tdValor.style.fontWeight = "bold";
+
+            const btnExcluir = document.createElement("button");
+            btnExcluir.textContent = "Excluir";
+            btnExcluir.className = "btn-excluir-transacao";
+            btnExcluir.onclick = () => excluirTransacao(transacao.id);
+            tdAcoes.appendChild(btnExcluir);
+
+            novaLinha.append(tdData, tdDescricao, tdCategoria, tdValor, tdAcoes);
+            tabelaTransacoes.appendChild(novaLinha);
+        }
+
+        function excluirTransacao(id) {
+            let transacoes = JSON.parse(localStorage.getItem('transacoes') || '[]');
+            transacoes = transacoes.filter(t => t.id !== id);
+            localStorage.setItem('transacoes', JSON.stringify(transacoes));
+            carregarTransacoes();
+        }
+
+        formTransacoes.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const novaTransacao = {
+                id: Date.now(),
+                data: formTransacoes.date.value,
+                descricao: formTransacoes.description.value,
+                valor: parseFloat(formTransacoes.value.value).toFixed(2),
+                tipo: formTransacoes.type.value
+            };
+            let transacoes = JSON.parse(localStorage.getItem('transacoes') || '[]');
+            transacoes.push(novaTransacao);
+            localStorage.setItem('transacoes', JSON.stringify(transacoes));
+            adicionarLinhaTransacao(novaTransacao);
+            atualizarResumoFinanceiro();
+            formTransacoes.reset();
+        });
+
+        function atualizarResumoFinanceiro() {
+            const transacoes = JSON.parse(localStorage.getItem('transacoes') || '[]');
+            
+            let totalGanhos = 0;
+            let totalGastos = 0;
+
+            transacoes.forEach(transacao => {
+                const valor = parseFloat(transacao.valor);
+                if (transacao.tipo === "income" || transacao.tipo === "investment") {
+                    totalGanhos += valor;
+                } else {
+                    totalGastos += valor;
+                }
+            });
+
+            const saldoAtual = totalGanhos - totalGastos;
+
+            document.getElementById('saldo-atual').textContent = `R$ ${saldoAtual.toFixed(2)}`;
+            document.getElementById('total-ganhos').textContent = `R$ ${totalGanhos.toFixed(2)}`;
+            document.getElementById('total-gastos').textContent = `R$ ${totalGastos.toFixed(2)}`;
+            document.getElementById('saldo-atual').style.color = saldoAtual >= 0 ? 'green' : 'red';
+            document.getElementById('total-ganhos').style.color = 'green';
+            document.getElementById('total-gastos').style.color = 'red';
+        }
+
+          const formMetas = document.getElementById("adicionar-meta");
+          const tabelaMetas = document.getElementById("tabela-metas");
+
+  
+          function carregarMetas() {
+              const metas = JSON.parse(localStorage.getItem('metas') || '[]');
+              tabelaMetas.innerHTML = '';
+              metas.forEach(meta => {
+                  adicionarLinhaMeta(meta);
+              });
+          }
+
+          function adicionarLinhaMeta(meta) {
+              const novaLinha = document.createElement("tr");
+              novaLinha.dataset.id = meta.id;
+
+              const tdNome = document.createElement("td");
+              const tdValor = document.createElement("td");
+              const tdProgresso = document.createElement("td");
+              const tdStatus = document.createElement("td");
+              const tdAcoes = document.createElement("td");
+
+              tdNome.textContent = meta.nome;
+              tdValor.textContent = `R$ ${parseFloat(meta.valorAtual || 0).toFixed(2)} / R$ ${parseFloat(meta.valor).toFixed(2)}`;
+
+              const progresso = document.createElement("div");
+              progresso.style.background = "#e0e0e0";
+              progresso.style.borderRadius = "10px";
+              progresso.style.height = "10px";
+              progresso.style.margin = "5px 0";
+
+              const barra = document.createElement("div");
+              barra.style.background = "#4CAF50";
+              barra.style.height = "100%";
+              barra.style.borderRadius = "10px";
+
+              const porcentagem = Math.min(100, ((meta.valorAtual || 0) / meta.valor) * 100);
+              barra.style.width = `${porcentagem}%`;
+              barra.textContent = " ";
+              progresso.appendChild(barra);
+
+              tdProgresso.appendChild(progresso);
+
+              tdStatus.textContent = meta.status || "Pendente";
+              tdStatus.style.color = meta.status === "Concluída" ? "#ffffff" : color="red";
+              tdStatus.style.fontWeight = "bold";
+
+              const btnExcluir = document.createElement("button");
+              btnExcluir.textContent = "excluir";
+              btnExcluir.className = "btn-excluir-meta";
+              btnExcluir.onclick = () => excluirMeta(meta.id);
+              tdAcoes.appendChild(btnExcluir);
+
+              const btnEditar = document.createElement("button");
+              btnEditar.textContent = "att";
+              btnEditar.className = "btn-editar-meta";
+              btnEditar.onclick = () => editarMeta(meta.id);
+              tdAcoes.appendChild(btnEditar);
+
+              novaLinha.append(tdNome, tdValor, tdProgresso, tdStatus, tdAcoes);
+              tabelaMetas.appendChild(novaLinha);
+          }
+
+          function excluirMeta(id) {
+              let metas = JSON.parse(localStorage.getItem('metas') || '[]');
+              metas = metas.filter(m => m.id !== id);
+              localStorage.setItem('metas', JSON.stringify(metas));
+              carregarMetas();
+          }
+
+          function editarMeta(id) {
+              const input = prompt("Quanto você quer adicionar à sua meta?");
+              if (input !== null) {
+                  const valorAdicionado = parseFloat(input);
+                  if (isNaN(valorAdicionado) || valorAdicionado <= 0) {
+                      alert("Por favor, insira um número válido e maior que zero.");
+                      return;
+                  }
+
+                  let metas = JSON.parse(localStorage.getItem('metas') || '[]');
+                  metas = metas.map(m => {
+                      if (m.id === id) {
+                          const novoValorAtual = parseFloat(m.valorAtual || 0) + valorAdicionado;
+                          const valorMeta = parseFloat(m.valor);
+
+                          let status = "Pendente";
+                          if (novoValorAtual >= valorMeta) status = "Concluída";
+
+                          return {
+                              ...m,
+                              valorAtual: novoValorAtual.toFixed(2),
+                              status: status
+                          };
+                      }
+                      return m;
+                  });
+
+                  localStorage.setItem('metas', JSON.stringify(metas));
+                  carregarMetas();
+              }
+          }
+          formMetas.addEventListener("submit", function(event){
+              event.preventDefault();
+
+              const novaMeta = {
+                  id: Date.now(),
+                  nome: formMetas.meta.value,
+                  valor: parseFloat(formMetas["valor-meta"].value).toFixed(2),
+                  valorAtual: 0,
+                  status: "Pendente"
+              };
+
+              let metas = JSON.parse(localStorage.getItem('metas') || '[]');
+              metas.push(novaMeta);
+              localStorage.setItem('metas', JSON.stringify(metas));
+
+              adicionarLinhaMeta(novaMeta);
+              formMetas.reset();
+          });
+
+          carregarMetas();
+
+
+        function adicionarLembrete() {
+            const nome = document.querySelector('input[name="lembrete"]').value;
+            const data = document.querySelector('input[name="data-lembrete"]').value;
+            
+            if (!nome || !data) {
+                alert('Preencha nome e data!');
+                return;
+            }
+            
+            const lembretes = JSON.parse(localStorage.getItem('lembretes') || '[]');
+            if (lembretes.length >= 2) {
+                alert('Máximo de 2 lembretes atingido! Exclua um para adicionar outro.');
+                return;
+            }
+            
+            const novoLembrete = {
+                id: Date.now(),
+                nome: nome,
+                data: data,
+                descricao: document.querySelector('input[name="descricao"]').value || ''
+            };
+            lembretes.push(novoLembrete);
+            localStorage.setItem('lembretes', JSON.stringify(lembretes));
+
+            carregarLembretes();
+          
+            document.querySelector('input[name="lembrete"]').value = '';
+            document.querySelector('input[name="data-lembrete"]').value = '';
+            document.querySelector('input[name="descricao"]').value = '';
+        }
+
+        function carregarLembretes() {
+            const lembretes = JSON.parse(localStorage.getItem('lembretes') || '[]');
+            const lista = document.getElementById('lembretes-lista');
+            const contador = document.getElementById('lembrete-count');
+
+            contador.textContent = `${lembretes.length}/2`;
+ 
+            lista.innerHTML = '';
+          
+            lembretes.forEach(lembrete => {
+                const hoje = new Date().toISOString().split('T')[0];
+                const dataFormatada = formatarData(lembrete.data);
+                
+                const div = document.createElement('div');
+                div.className = `lembrete-miniatura ${lembrete.data === hoje ? 'lembrete-hoje' : ''}`;
+                div.innerHTML = `
+                    <div class="lembrete-titulo">${lembrete.nome}</div>
+                    <div class="lembrete-data">${dataFormatada}</div>
+                    <div class="lembrete-descricao">${lembrete.descricao}</div>
+                    <button class="lembrete-excluir" onclick="excluirLembrete(${lembrete.id})">
+                        Excluir
+                    </button>
+                `;
+                
+                lista.appendChild(div);
+            });
+  
+            if (lembretes.length === 0) {
+                lista.innerHTML = '<div style="color: rgba(255,255,255,0.5); font-size: 11px; padding: 10px; text-align: center;">Nenhum lembrete</div>';
+            }
+        }
+
+        function excluirLembrete(id) {
+            let lembretes = JSON.parse(localStorage.getItem('lembretes') || '[]');
+            lembretes = lembretes.filter(l => l.id !== id);
+            localStorage.setItem('lembretes', JSON.stringify(lembretes));
+            carregarLembretes();
+        }
+
+        function formatarData(dataString) {
+            const data = new Date(dataString);
+            const hoje = new Date();
+            
+            if (data.toDateString() === hoje.toDateString()) {
+                return 'Hoje';
+            }
+            
+            return data.toLocaleDateString('pt-BR');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarTransacoes();
+            carregarMetas();
+            carregarLembretes();
+        });
+
+        const ctxGastos = document.getElementById("graficoGastos").getContext("2d");
+          const ctxSaldo = document.getElementById("graficoSaldo").getContext("2d");
+
+          const graficoGastos = new Chart(ctxGastos, {
+            type: "bar",
+            data: {
+              labels: ["Ganhos", "Gastos"],
+              datasets: [{
+                label: "Resumo financeiro (R$)",
+                data: [0, 0],
+                backgroundColor: ["#4CAF50", "#F44336"]
+              }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+          });
+
+          const graficoSaldo = new Chart(ctxSaldo, {
+            type: "doughnut",
+            data: {
+              labels: ["Saldo restante", "Gastos"],
+              datasets: [{
+                data: [0, 0],
+                backgroundColor: ["#2196F3", "#FF9800"]
+              }]
+            },
+            options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+          });
+
+          function atualizarGraficos() {
+            const transacoes = JSON.parse(localStorage.getItem('transacoes') || '[]');
+
+            let ganhos = 0, gastos = 0;
+            transacoes.forEach(t => {
+              const valor = parseFloat(t.valor);
+              if (t.tipo === "income" || t.tipo === "investment") ganhos += valor;
+              else gastos += valor;
+            });
+
+            const saldo = ganhos - gastos;
+            graficoGastos.data.datasets[0].data = [ganhos, gastos];
+            graficoGastos.update();
+
+            graficoSaldo.data.datasets[0].data = [saldo > 0 ? saldo : 0, gastos];
+            graficoSaldo.update();
+          }
+
+        
+          document.addEventListener("DOMContentLoaded", atualizarGraficos);
+          formTransacoes.addEventListener("submit", atualizarGraficos); 
+      </script>
+
+    </main>
+  </div>
+</body>
+</html>

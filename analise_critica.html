@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { margin: 2.5cm 2.8cm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #111;
+    max-width: 100%;
+  }
+  .cabecalho {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #333;
+  }
+  .cabecalho h1 {
+    font-size: 15pt;
+    margin: 0 0 6px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .cabecalho p {
+    margin: 2px 0;
+    font-size: 11pt;
+    color: #333;
+  }
+  h2 {
+    font-size: 12pt;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 22px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 3px;
+  }
+  h3 {
+    font-size: 12pt;
+    margin-top: 14px;
+    margin-bottom: 4px;
+  }
+  p { margin: 0 0 8px 0; text-align: justify; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 14px 0;
+    font-size: 11pt;
+  }
+  th {
+    background: #2c2c2c;
+    color: #fff;
+    padding: 6px 10px;
+    text-align: left;
+    font-weight: bold;
+  }
+  td { padding: 5px 10px; border-bottom: 1px solid #ddd; }
+  tr:nth-child(even) td { background: #f5f5f5; }
+  .destaque {
+    background: #fff8e1;
+    border-left: 4px solid #f0a500;
+    padding: 8px 12px;
+    margin: 10px 0;
+    font-size: 11pt;
+  }
+  .rodape {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #aaa;
+    font-size: 10pt;
+    color: #555;
+    text-align: center;
+  }
+  ul { margin: 4px 0 10px 0; padding-left: 22px; }
+  li { margin-bottom: 3px; }
+  strong { font-weight: bold; }
+  code {
+    font-family: "Courier New", monospace;
+    font-size: 10.5pt;
+    background: #f0f0f0;
+    padding: 1px 4px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="cabecalho">
+  <h1>Análise Crítica — Testes Unitários e Cobertura de Código</h1>
+  <p><strong>Projeto:</strong> StonksView — Gerenciador Financeiro Pessoal</p>
+  <p><strong>Disciplina:</strong> Testes e Qualidade de Software &nbsp;|&nbsp; <strong>Etapa:</strong> Projeto Integrador – Etapa 1</p>
+</div>
+
+<h2>1. Contexto e Módulo Selecionado</h2>
+<p>
+O StonksView é uma aplicação web desenvolvida em Django que permite ao usuário gerenciar suas
+finanças pessoais por meio de transações, metas financeiras e lembretes. Para esta etapa, foram
+selecionados os módulos do app <code>usuarios</code>, que concentra toda a lógica de negócio da
+aplicação: validação de senhas (<code>validators.py</code>), modelos de dados (<code>models.py</code>),
+formulários (<code>forms.py</code>) e as views responsáveis pelos endpoints HTTP (<code>views.py</code>).
+</p>
+<p>
+A escolha se justifica por esses módulos conterem as regras mais críticas do sistema — criação e
+autenticação de usuários, registro de transações financeiras e controle de progresso de metas —
+tornando-os os candidatos mais relevantes para garantia de qualidade.
+</p>
+
+<h2>2. Testes Implementados</h2>
+<p>
+Foram implementados <strong>90 testes unitários</strong> organizados em 11 classes, cobrindo os quatro
+arquivos de código principal:
+</p>
+
+<table>
+  <tr><th>Classe de Teste</th><th>Qtd.</th><th>Foco</th></tr>
+  <tr><td>CustomPasswordValidatorTests</td><td>11</td><td>Regras de validação de senha</td></tr>
+  <tr><td>CustomUserManagerTests</td><td>7</td><td>Criação de usuários e superusuários</td></tr>
+  <tr><td>CustomUserModelTests</td><td>4</td><td>Comportamento do model de usuário</td></tr>
+  <tr><td>TransacaoModelTests</td><td>8</td><td>Tipos e atributos de transações</td></tr>
+  <tr><td>MetaFinanceiraAdicionarProgressoTests</td><td>12</td><td>Lógica de progresso de metas</td></tr>
+  <tr><td>MetaFinanceiraModelTests</td><td>2</td><td>Defaults do model de metas</td></tr>
+  <tr><td>LembreteModelTests</td><td>3</td><td>Model de lembretes</td></tr>
+  <tr><td>LoginFormTests</td><td>6</td><td>Validação do formulário de login</td></tr>
+  <tr><td>Views (Autenticação, Perfil, Transações, Metas, Lembretes)</td><td>37</td><td>Endpoints HTTP completos</td></tr>
+</table>
+
+<p>
+Os testes cobrem os três tipos exigidos: <strong>cenários principais</strong> (fluxo feliz),
+<strong>casos de erro</strong> (entradas inválidas, recursos inexistentes, acesso não autorizado) e
+<strong>casos de limite</strong> (valores no exato limiar das regras, como senha com exatamente 8
+caracteres, progresso de meta que ultrapassa o valor alvo, e valor negativo sendo zerado
+automaticamente).
+</p>
+
+<h2>3. Cobertura de Código</h2>
+<p>A execução com a ferramenta <code>coverage.py</code> produziu os seguintes resultados:</p>
+
+<table>
+  <tr><th>Arquivo</th><th>Linhas</th><th>Não cobertas</th><th>Cobertura</th></tr>
+  <tr><td>validators.py</td><td>16</td><td>0</td><td><strong>100%</strong></td></tr>
+  <tr><td>models.py</td><td>80</td><td>0</td><td><strong>100%</strong></td></tr>
+  <tr><td>forms.py</td><td>4</td><td>0</td><td><strong>100%</strong></td></tr>
+  <tr><td>views.py</td><td>212</td><td>58</td><td><strong>73%</strong></td></tr>
+  <tr><td><strong>TOTAL</strong></td><td><strong>791</strong></td><td><strong>66</strong></td><td><strong>92%</strong></td></tr>
+</table>
+
+<p>
+Os arquivos com lógica de negócio pura (<code>models.py</code> e <code>validators.py</code>) atingiram
+cobertura total de 100%, demonstrando que todas as regras críticas do domínio estão verificadas.
+A cobertura de <code>views.py</code> ficou em 73%, pois as views de recuperação e redefinição de senha
+não foram cobertas — conforme detalhado na seção seguinte.
+</p>
+
+<h2>4. Lacunas Identificadas</h2>
+
+<h3>4.1 Views de recuperação de senha</h3>
+<p>
+As views <code>recuperar_senha</code> e <code>redefinir_senha</code> (linhas 61–111 de
+<code>views.py</code>) dependem do envio real de e-mail via SMTP e da geração e validação de tokens
+de segurança temporários. Testá-las exige configuração adicional: uso de backend de e-mail em
+memória e simulação do ciclo completo de token. Embora tecnicamente viável, optou-se por não
+incluir esses testes nesta etapa para manter o foco na lógica de negócio central. Essa é a
+principal lacuna da cobertura atual.
+</p>
+
+<h3>4.2 Testes de integração ausentes</h3>
+<p>
+Os testes implementados são estritamente unitários. Não há testes de integração que verifiquem,
+por exemplo, o fluxo completo de cadastro → login → criação de meta → conclusão de meta em
+sequência, passando por múltiplas camadas simultaneamente.
+</p>
+
+<h3>4.3 Ausência de testes de interface</h3>
+<p>
+Nenhum teste de front-end foi implementado. A camada HTML/CSS/JavaScript não possui verificações
+automatizadas de comportamento no navegador.
+</p>
+
+<h2>5. Bugs Encontrados Através dos Testes</h2>
+
+<div class="destaque">
+  A execução dos testes revelou um bug real presente em três endpoints da aplicação:
+  <code>adicionar_transacao</code>, <code>adicionar_meta</code> e <code>adicionar_lembrete</code>.
+</div>
+
+<p>
+<strong>Causa:</strong> após <code>Model.objects.create()</code> no Django 3.2 com SQLite, campos
+do tipo <code>DateField</code> retornam o valor como <code>str</code> em vez de
+<code>datetime.date</code>. O código das views chamava <code>.strftime('%Y-%m-%d')</code>
+diretamente sobre esse valor, o que gerava <code>AttributeError: 'str' object has no attribute
+'strftime'</code> e fazia os três endpoints retornarem HTTP 400 em vez de 200.
+</p>
+<p>
+<strong>Correção aplicada:</strong> adicionado <code>instance.refresh_from_db()</code>
+imediatamente após cada <code>create()</code>, forçando o ORM a reler o registro do banco com os
+tipos Python corretos antes de construir a resposta JSON.
+</p>
+<p>
+Esse achado ilustra o valor prático dos testes unitários: um comportamento incorreto que
+passaria despercebido em revisão de código foi detectado e corrigido de forma objetiva.
+</p>
+
+<h2>6. Riscos e Melhorias Sugeridas</h2>
+
+<p><strong>Riscos identificados:</strong></p>
+<ul>
+  <li>A ausência de testes para o fluxo de recuperação de senha representa um risco de segurança:
+  falhas na geração ou validação de tokens podem passar despercebidas em futuras alterações.</li>
+  <li>O banco SQLite utilizado em desenvolvimento não é adequado para produção, podendo apresentar
+  comportamentos distintos dos que os testes locais verificam.</li>
+  <li>Credenciais de e-mail e a <code>SECRET_KEY</code> estão expostas diretamente no
+  <code>settings.py</code>, representando risco de segurança caso o repositório seja público.</li>
+</ul>
+
+<p><strong>Melhorias sugeridas:</strong></p>
+<ul>
+  <li>Implementar testes para as views de recuperação de senha utilizando o backend de e-mail em
+  memória do Django e mock de tokens.</li>
+  <li>Adicionar testes de integração cobrindo fluxos completos do usuário.</li>
+  <li>Separar as configurações em variáveis de ambiente, evitando exposição de credenciais no
+  código-fonte.</li>
+  <li>Migrar o banco para PostgreSQL, tornando o ambiente de testes mais fiel ao de produção.</li>
+</ul>
+
+<h2>7. Conclusão</h2>
+<p>
+Os testes implementados cobrem <strong>92% do código total</strong> da aplicação e
+<strong>100% dos módulos de lógica de negócio pura</strong>. Além de garantir a qualidade do
+código existente, o processo de escrita dos testes revelou um bug funcional real em três
+endpoints da API, demonstrando concretamente o valor da prática de testes unitários. As lacunas
+identificadas — principalmente as views de recuperação de senha e a ausência de testes de
+integração — representam trabalho futuro claro e bem delimitado para as próximas etapas do
+projeto.
+</p>
+
+<div class="rodape">
+  StonksView &nbsp;|&nbsp; Testes e Qualidade de Software &nbsp;|&nbsp; Projeto Integrador – Etapa 1
+</div>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Operations to perform:
+  Synchronize unmigrated apps: messages, staticfiles
+  Apply all migrations: admin, auth, contenttypes, sessions, usuarios
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying usuarios.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying sessions.0001_initial... OK
+System check identified no issues (0 silenced).
+test_cadastro_email_duplicado_nao_cria_segundo_usuario (usuarios.tests_integracao.IntegracaoCadastroLoginTests)
+Email já cadastrado retorna erro e mantém apenas um usuário. ... ok
+test_cadastro_senha_curta_nao_cria_usuario (usuarios.tests_integracao.IntegracaoCadastroLoginTests)
+Senha com menos de 8 chars falha no CustomPasswordValidator e não cria usuário. ... ok
+test_cadastro_senha_sem_maiuscula_nao_cria_usuario (usuarios.tests_integracao.IntegracaoCadastroLoginTests)
+Senha sem letra maiúscula falha no CustomPasswordValidator. ... ok
+test_cadastro_senha_sem_simbolo_nao_cria_usuario (usuarios.tests_integracao.IntegracaoCadastroLoginTests)
+Senha sem símbolo falha no CustomPasswordValidator. ... ok
+test_cadastro_valido_cria_usuario_e_autentica (usuarios.tests_integracao.IntegracaoCadastroLoginTests)
+Cadastro com dados válidos cria usuário no banco e autentica automaticamente. ... ok
+test_login_apos_cadastro_funciona (usuarios.tests_integracao.IntegracaoCadastroLoginTests)
+Após cadastro, login com as mesmas credenciais deve autenticar com sucesso. ... ok
+test_login_com_senha_errada_nao_autentica (usuarios.tests_integracao.IntegracaoCadastroLoginTests)
+Login com senha incorreta não cria sessão autenticada. ... ok
+test_b_nao_pode_adicionar_progresso_em_meta_de_a (usuarios.tests_integracao.IntegracaoIsolacaoDadosTests)
+Usuário B não deve conseguir adicionar progresso em meta do usuário A. ... ok
+test_b_nao_pode_excluir_lembrete_de_a (usuarios.tests_integracao.IntegracaoIsolacaoDadosTests)
+Usuário B não deve conseguir excluir lembrete que pertence ao usuário A. ... ok
+test_b_nao_pode_excluir_meta_de_a (usuarios.tests_integracao.IntegracaoIsolacaoDadosTests)
+Usuário B não deve conseguir excluir meta que pertence ao usuário A. ... ok
+test_b_nao_pode_excluir_transacao_de_a (usuarios.tests_integracao.IntegracaoIsolacaoDadosTests)
+Usuário B não deve conseguir excluir transação que pertence ao usuário A. ... ok
+test_lembrete_de_a_nao_aparece_para_b (usuarios.tests_integracao.IntegracaoIsolacaoDadosTests)
+Lembrete criado pelo usuário A não deve aparecer na listagem do usuário B. ... ok
+test_meta_de_a_nao_aparece_para_b (usuarios.tests_integracao.IntegracaoIsolacaoDadosTests)
+Meta criada pelo usuário A não deve aparecer na listagem do usuário B. ... ok
+test_transacao_de_a_nao_aparece_para_b (usuarios.tests_integracao.IntegracaoIsolacaoDadosTests)
+Transação criada pelo usuário A não deve aparecer na listagem do usuário B. ... ok
+test_excluir_meta_remove_da_listagem (usuarios.tests_integracao.IntegracaoMetaFinanceiraTests)
+Após excluir meta, ela não deve mais aparecer na listagem JSON. ... ok
+test_listar_metas_retorna_porcentagem_calculada (usuarios.tests_integracao.IntegracaoMetaFinanceiraTests)
+Endpoint de listagem deve retornar a porcentagem corretamente calculada. ... ok
+test_meta_criada_com_status_pendente (usuarios.tests_integracao.IntegracaoMetaFinanceiraTests)
+Meta recém-criada deve ter status 'Pendente' e valor_atual igual a zero. ... ok
+test_multiplos_progressos_acumulam_ate_concluir (usuarios.tests_integracao.IntegracaoMetaFinanceiraTests)
+Múltiplos progressos parciais devem acumular até concluir a meta. ... ok
+test_progresso_completo_muda_status_para_concluida (usuarios.tests_integracao.IntegracaoMetaFinanceiraTests)
+Ao atingir 100% do valor alvo, status deve mudar para 'Concluída'. ... ok
+test_progresso_negativo_retorna_400_e_nao_altera_meta (usuarios.tests_integracao.IntegracaoMetaFinanceiraTests)
+Valor negativo no progresso deve retornar 400 e não alterar a meta. ... ok
+test_progresso_parcial_muda_status_para_em_andamento (usuarios.tests_integracao.IntegracaoMetaFinanceiraTests)
+Adicionar progresso parcial deve mudar o status para 'Em andamento'. ... ok
+test_login_com_nova_senha_apos_reset (usuarios.tests_integracao.IntegracaoRecuperacaoSenhaTests)
+Após reset bem-sucedido, login com a nova senha deve autenticar o usuário. ... ok
+test_recuperar_senha_email_existente_envia_email (usuarios.tests_integracao.IntegracaoRecuperacaoSenhaTests)
+POST com email cadastrado deve chamar send_mail e redirecionar para login. ... ok
+test_recuperar_senha_email_inexistente_nao_envia_email (usuarios.tests_integracao.IntegracaoRecuperacaoSenhaTests)
+POST com email não cadastrado não deve chamar send_mail. ... ok
+test_reset_senha_invalida_nao_altera_senha (usuarios.tests_integracao.IntegracaoRecuperacaoSenhaTests)
+POST com senha que viola CustomPasswordValidator não deve alterar a senha. ... ok
+test_reset_senha_valida_altera_senha_e_redireciona (usuarios.tests_integracao.IntegracaoRecuperacaoSenhaTests)
+POST com nova senha válida deve alterar a senha e redirecionar para login. ... ok
+test_reset_token_invalido_redireciona_para_recuperar (usuarios.tests_integracao.IntegracaoRecuperacaoSenhaTests)
+GET com token inválido deve redirecionar para a página de recuperação. ... ok
+test_reset_token_valido_renderiza_formulario (usuarios.tests_integracao.IntegracaoRecuperacaoSenhaTests)
+GET na URL de reset com token válido deve renderizar o formulário. ... ok
+test_dashboard_calcula_saldo_correto (usuarios.tests_integracao.IntegracaoTransacoesDashboardTests)
+Saldo deve ser igual a soma de income menos soma de expense. ... ok
+test_dashboard_ignora_transacoes_de_outro_usuario (usuarios.tests_integracao.IntegracaoTransacoesDashboardTests)
+Transações de outro usuário não devem aparecer no dashboard do usuário atual. ... ok
+test_dashboard_soma_apenas_expense_nos_gastos (usuarios.tests_integracao.IntegracaoTransacoesDashboardTests)
+Dashboard deve contabilizar apenas tipo 'expense' nos gastos. ... ok
+test_dashboard_soma_apenas_income_nos_ganhos (usuarios.tests_integracao.IntegracaoTransacoesDashboardTests)
+Dashboard deve contabilizar apenas tipo 'income' nos ganhos. ... ok
+test_dashboard_tipos_extras_nao_afetam_saldo (usuarios.tests_integracao.IntegracaoTransacoesDashboardTests)
+Tipos 'investment', 'extra' e 'other' não devem alterar ganhos nem gastos. ... ok
+test_excluir_transacao_reflete_no_dashboard (usuarios.tests_integracao.IntegracaoTransacoesDashboardTests)
+Excluir uma transação deve remover seu valor do dashboard. ... ok
+
+----------------------------------------------------------------------
+Ran 34 tests in 5.035s
+
+OK
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...

@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="{% static 'usuarios/imagens/cofrinho.png' %}" type="image/png" sizes="180x180">
+
+  <title>Stonks Viewer</title>
+  <link rel="stylesheet" href="{% static 'usuarios/perfil.css' %}" />
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">Stonks Viewer</div>
+      </div>
+
+      <li class="lembretes-section">
+        <div class="lembretes-header">
+          <span>Lembretes: </span>
+          <span class="lembrete-count" id="lembrete-count">0</span>
+        </div>
+        <div class="lembretes-lista" id="lembretes-lista"></div>
+      </li>
+
+      <!-- 🎯 SIDEBAR COMAPCTA: Apenas Metas e Sair -->
+        <nav class="sidebar-nav">
+          <ul>
+            <li><a href="{% url 'listar_metas' %}">Metas</a></li>
+            <li><a href="{% url 'sair' %}">Sair</a></li>
+          </ul>
+        </nav>
+
+
+      <div class="sidebar-user-profile">
+        <div class="user-avatar"></div>
+        <div class="user-info">
+          <p class="user-name">{{ request.user.first_name }}</p>
+          <p class="user-email">{{ request.user.email }}</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="main-content">
+      <header class="main-header"><h1>Sua visão geral financeira</h1></header>
+
+      <!-- Resumo -->
+      <section class="summary-cards">
+        <div class="card"><h2>Saldo Atual</h2><p id="saldo-atual">R$ 0,00</p></div>
+        <div class="card"><h2>Ganhos</h2><p id="total-ganhos">R$ 0,00</p></div>
+        <div class="card"><h2>Gastos</h2><p id="total-gastos">R$ 0,00</p></div>
+      </section>
+
+      <!-- Adicionar Lembrete -->
+      <section id="adicionar-lembrete">
+        <h3>Adicionar Lembrete</h3>
+        <form id="form-lembrete">
+          <input type="text" name="lembrete" placeholder="Nome" required />
+          <input type="date" name="data-lembrete" required />
+          <input type="text" name="descricao" placeholder="Descrição" />
+          <button type="submit">Adicionar</button>
+        </form>
+      </section>
+
+      <!-- Transações -->
+      <section id="recent-transactions">
+        <h3>Últimas Movimentações</h3>
+        <table>
+          <thead>
+            <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="tabela-transacoes"></tbody>
+        </table>
+      </section>
+
+      <section class="add-transaction-form">
+        <h3>Adicionar Nova Movimentação</h3>
+        <form id="add-transaction-form">
+          <input type="date" name="date" required />
+          <input type="text" name="description" placeholder="Descrição" required />
+          <input type="number" name="value" placeholder="Valor" step="0.01" required />
+          <select name="type" required>
+            <option value="income">Ganho fixo</option>
+            <option value="investment">Ganho extra</option>
+            <option value="expense">Gasto fixo</option>
+            <option value="extra">Gasto extra</option>
+            <option value="other">Outro</option>
+          </select>
+          <button type="submit">Adicionar</button>
+        </form>
+      </section>
+
+      <!-- SCRIPT -->
+      <script>
+        // -------------------------------
+        // CSRF TOKEN - Necessário p/ POST
+        // -------------------------------
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+        const csrfToken = getCookie("csrftoken");
+
+        function headers() {
+          return {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+            "X-Requested-With": "XMLHttpRequest"
+          };
+        }
+
+        // ------- TRANSACOES -------
+        const formTransacoes = document.getElementById("add-transaction-form");
+        const tabelaTransacoes = document.getElementById("tabela-transacoes");
+
+        async function carregarTransacoes() {
+          const r = await fetch("{% url 'listar_transacoes' %}");
+          const data = await r.json();
+          const transacoes = data.transacoes;
+          tabelaTransacoes.innerHTML = "";
+          transacoes.forEach(adicionarLinhaTransacao);
+          atualizarResumoFinanceiro(transacoes);
+        }
+
+        function adicionarLinhaTransacao(t) {
+          const valor = parseFloat(t.valor);
+          const cor = ["income", "investment"].includes(t.tipo) ? "green" : "red";
+          const linha = document.createElement("tr");
+          linha.innerHTML = `
+            <td>${t.data}</td>
+            <td>${t.descricao}</td>
+            <td>${traduzirTipo(t.tipo)}</td>
+            <td style="color:${cor};font-weight:bold">
+              R$ ${valor.toFixed(2)}
+            </td>
+            <td><button onclick="excluirTransacao(${t.id})">Excluir</button></td>`;
+          tabelaTransacoes.appendChild(linha);
+        }
+
+        async function excluirTransacao(id) {
+          await fetch(`{% url 'excluir_transacao' 0 %}`.replace("0", id), {
+            method: "DELETE",
+            headers: headers()
+          });
+          carregarTransacoes();
+        }
+
+        formTransacoes.addEventListener("submit", async e => {
+          e.preventDefault();
+          const body = {
+            data: formTransacoes.date.value,
+            descricao: formTransacoes.description.value,
+            valor: formTransacoes.value.value,
+            tipo: formTransacoes.type.value
+          };
+          await fetch("{% url 'adicionar_transacao' %}", {
+            method: "POST",
+            headers: headers(),
+            body: JSON.stringify(body)
+          });
+          formTransacoes.reset();
+          carregarTransacoes();
+        });
+
+        function traduzirTipo(tipo) {
+          const mapa = {
+            income: "Ganho fixo",
+            investment: "Ganho extra",
+            expense: "Gasto fixo",
+            extra: "Gasto extra",
+            other: "Outro"
+          };
+          return mapa[tipo] || tipo;
+        }
+
+        function atualizarResumoFinanceiro(transacoes) {
+          let ganhos = 0, gastos = 0;
+          transacoes.forEach(t => {
+            const v = parseFloat(t.valor);
+            if (["income", "investment"].includes(t.tipo)) ganhos += v;
+            else gastos += v;
+          });
+          const saldo = ganhos - gastos;
+          document.getElementById("saldo-atual").textContent = `R$ ${saldo.toFixed(2)}`;
+          document.getElementById("total-ganhos").textContent = `R$ ${ganhos.toFixed(2)}`;
+          document.getElementById("total-gastos").textContent = `R$ ${gastos.toFixed(2)}`;
+        }
+
+        // ------- LEMBRETES -------
+        const formLembrete = document.getElementById("form-lembrete");
+        const listaLembretes = document.getElementById("lembretes-lista");
+        const contadorLembretes = document.getElementById("lembrete-count");
+
+        async function carregarLembretes() {
+          const r = await fetch("{% url 'listar_lembretes' %}");
+          const data = await r.json();
+          const lembretes = data.lembretes;
+          contadorLembretes.textContent = `${lembretes.length}/2`;
+          listaLembretes.innerHTML = "";
+          lembretes.forEach(l => {
+            const hoje = new Date().toISOString().split("T")[0];
+            const div = document.createElement("div");
+            div.className = `lembrete-miniatura ${l.data === hoje ? "lembrete-hoje" : ""}`;
+            div.innerHTML = `
+              <div class="lembrete-titulo">${l.nome}</div>
+              <div class="lembrete-data">${l.data}</div>
+              <div class="lembrete-descricao">${l.descricao || ''}</div>
+              <button onclick="excluirLembrete(${l.id})">Excluir</button>`;
+            listaLembretes.appendChild(div);
+          });
+        }
+
+        formLembrete.addEventListener("submit", async e => {
+          e.preventDefault();
+          const body = {
+            nome: formLembrete.lembrete.value,
+            data: formLembrete["data-lembrete"].value,
+            descricao: formLembrete.descricao.value
+          };
+          await fetch("{% url 'adicionar_lembrete' %}", {
+            method: "POST",
+            headers: headers(),
+            body: JSON.stringify(body)
+          });
+          formLembrete.reset();
+          carregarLembretes();
+        });
+
+        async function excluirLembrete(id) {
+          await fetch(`{% url 'excluir_lembrete' 0 %}`.replace("0", id), {
+            method: "DELETE",
+            headers: headers()
+          });
+          carregarLembretes();
+        }
+
+        // ------- INICIALIZAÇÃO -------
+        document.addEventListener("DOMContentLoaded", () => {
+          carregarTransacoes();
+          carregarLembretes();
+        });
+      </script>
+    </main>
+  </div>
+</body>
+</html>
