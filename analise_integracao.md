@@ -22,7 +22,7 @@ Valida a cadeia: `recuperar_senha view` → `CustomUser.objects.get()` → `defa
 ### Fluxo 3 — Transações e cálculo do dashboard (6 testes)
 Classe: `IntegracaoTransacoesDashboardTests`
 
-Valida a cadeia: `adicionar_transacao view` → `Transacao.objects.create()` → `dashboard view` → lógica de agregação Python. Os testes verificam a separação correta dos tipos (apenas `income` vai para ganhos, apenas `expense` vai para gastos), o cálculo do saldo, o isolamento entre usuários, e o reflexo imediato de exclusões no dashboard.
+Observa e valida a cadeia: `adicionar_transacao view` → `Transacao.objects.create()` → `dashboard view` → lógica de agregação Python. Os testes verificam a separação correta dos tipos (apenas `income` vai para ganhos, apenas `expense` vai para gastos), o cálculo do saldo, o isolamento entre usuários, e o reflexo imediato de exclusões no dashboard.
 
 ### Fluxo 4 — Ciclo de vida completo de metas financeiras (7 testes)
 Classe: `IntegracaoMetaFinanceiraTests`
@@ -39,7 +39,7 @@ Valida que os filtros `usuario=request.user` presentes em todas as views funcion
 ## 2. Problemas Encontrados
 
 ### Problema 1 — Acoplamento implícito entre `send_mail` e o módulo `usuarios.views`
-Ao escrever o Fluxo 2, constatou-se que a view `recuperar_senha` importa e chama `send_mail` diretamente, sem abstração de camada de serviço. Isso tornou obrigatório o uso de `unittest.mock.patch('usuarios.views.send_mail')` para evitar chamadas SMTP reais durante os testes. O problema em si não impede a execução dos testes, mas revela um acoplamento forte entre a view e o serviço externo de e-mail.
+Ao escrever o Fluxo 2, constatou-se que `recuperar_senha` importa e chama o `send_mail` diretamente, sem abstração de camada de serviço. Isso tornou obrigatório o uso de `unittest.mock.patch('usuarios.views.send_mail')` para evitar chamadas SMTP reais durante os testes. O problema em si não impede a execução dos testes, mas revela um acoplamento forte entre a view e o serviço externo de e-mail.
 
 ### Problema 2 — Dashboard retorna `Decimal('0')` em vez de `int(0)` para transações vazias
 Ao testar o `dashboard` sem transações cadastradas, o contexto retornado pelo Django continha `Decimal('0')` (resultado de `sum([])`, que retorna `0` inteiro em Python, mas os valores existentes são `Decimal`). O teste precisou utilizar `Decimal('0')` nas asserções em vez de `0` para evitar falsos negativos por incompatibilidade de tipos, revelando inconsistência no tipo de retorno da view dependendo da presença ou ausência de dados.
