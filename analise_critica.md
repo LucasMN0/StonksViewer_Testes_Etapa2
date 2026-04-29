@@ -29,7 +29,7 @@ os quatro arquivos de código principal:
 | Classe de Teste | Testes | Foco |
 |---|---|---|
 | `CustomPasswordValidatorTests` | 11 | Regras de validação de senha |
-| `CustomUserManagerTests` | 7 | Criação de usuários e superusuários |
+| `CustomUserManagerTests` | 7 | Criação de novos usuários e superusuários |
 | `CustomUserModelTests` | 4 | Comportamento do model de usuário |
 | `TransacaoModelTests` | 8 | Tipos e atributos de transações |
 | `MetaFinanceiraAdicionarProgressoTests` | 12 | Lógica de progresso de metas |
@@ -38,7 +38,7 @@ os quatro arquivos de código principal:
 | `LoginFormTests` | 6 | Validação do formulário de login |
 | Views (Autenticação, Perfil, Transações, Metas, Lembretes) | 37 | Endpoints HTTP |
 
-Os testes cobrem os três tipos exigidos: **cenários principais** (fluxo feliz),
+Os testes cobrem os três tipos exigidos: **principais cenarios** (fluxo feliz),
 **casos de erro** (entradas inválidas, recursos inexistentes, acesso não
 autorizado) e **casos de limite** (valores no exato limiar das regras, como
 senha com exatamente 8 caracteres ou meta com progresso que ultrapassa o valor

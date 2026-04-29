@@ -39,10 +39,10 @@ Valida que os filtros `usuario=request.user` presentes em todas as views funcion
 ## 2. Problemas Encontrados
 
 ### Problema 1 — Acoplamento implícito entre `send_mail` e o módulo `usuarios.views`
-Ao escrever o Fluxo 2, constatou-se que `recuperar_senha` importa e chama o `send_mail` diretamente, sem abstração de camada de serviço. Isso tornou obrigatório o uso de `unittest.mock.patch('usuarios.views.send_mail')` para evitar chamadas SMTP reais durante os testes. O problema em si não impede a execução dos testes, mas revela um acoplamento forte entre a view e o serviço externo de e-mail.
+No processo de escrita do Fluxo 2, constatou-se que `recuperar_senha` importa e chama o `send_mail` diretamente, sem abstração de camada de serviço. Isso tornou obrigatório o uso de `unittest.mock.patch('usuarios.views.send_mail')` para evitar chamadas SMTP reais durante os testes. O problema em si não impede a execução dos testes, mas revela um acoplamento forte entre a view e o serviço externo de e-mail.
 
 ### Problema 2 — Dashboard retorna `Decimal('0')` em vez de `int(0)` para transações vazias
-Ao testar o `dashboard` sem transações cadastradas, o contexto retornado pelo Django continha `Decimal('0')` (resultado de `sum([])`, que retorna `0` inteiro em Python, mas os valores existentes são `Decimal`). O teste precisou utilizar `Decimal('0')` nas asserções em vez de `0` para evitar falsos negativos por incompatibilidade de tipos, revelando inconsistência no tipo de retorno da view dependendo da presença ou ausência de dados.
+No processo de teste do `dashboard` sem transações cadastradas, o contexto retornado pelo Django continha `Decimal('0')` (resultado de `sum([])`, que retorna `0` inteiro em Python, mas os valores existentes são `Decimal`). O teste precisou utilizar `Decimal('0')` nas asserções em vez de `0` para evitar falsos negativos por incompatibilidade de tipos, revelando inconsistência no tipo de retorno da view dependendo da presença ou ausência de dados.
 
 ---
 
@@ -64,4 +64,4 @@ Ran 34 tests in 5.035s
 OK
 ```
 
-Todos os 34 testes passaram sem falhas. A suíte de integração, somada à suíte unitária da Etapa 1, resulta em **124 testes totais** cobrindo os fluxos críticos do StonksView de forma isolada (unitária) e em conjunto (integração), garantindo que as camadas do sistema se comunicam corretamente.
+Todos os 34 testes passaram sem falhas. A suíte de integração, somada à suíte unitária da Etapa 1, resulta em **124 testes totais** cobrindo os fluxos críticos do StonksView de forma isolada (unitária) e em conjunto (integração), garantindo as camadas do sistema se comunicam corretamente.
