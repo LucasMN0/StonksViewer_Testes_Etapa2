@@ -73,6 +73,15 @@ class Transacao(models.Model):
     def __str__(self):
         return f"{self.descricao} - {self.valor}"
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'data': self.data.strftime('%Y-%m-%d'),
+            'descricao': self.descricao,
+            'valor': float(self.valor),
+            'tipo': self.tipo,
+        }
+
 
 # ============================================================
 # METAS FINANCEIRAS (ajustado para funcionar com as views)
@@ -103,6 +112,24 @@ class MetaFinanceira(models.Model):
 
     def __str__(self):
         return self.nome
+
+    @property
+    def porcentagem(self):
+        if self.valor > 0:
+            return float(round((self.valor_atual / self.valor) * 100, 1))
+        return 0.0
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'nome': self.nome,
+            'valor': float(self.valor),
+            'valor_atual': float(self.valor_atual),
+            'data_inicial': self.data_inicial.strftime('%Y-%m-%d'),
+            'data_final': self.data_final.strftime('%Y-%m-%d'),
+            'status': self.status,
+            'porcentagem': self.porcentagem,
+        }
 
     # ===========================================
     # FUNÇÃO QUE AS VIEWS VÃO USAR DIRETAMENTE
@@ -141,3 +168,11 @@ class Lembrete(models.Model):
 
     def __str__(self):
         return self.nome
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'nome': self.nome,
+            'descricao': self.descricao,
+            'data': self.data.strftime('%Y-%m-%d'),
+        }

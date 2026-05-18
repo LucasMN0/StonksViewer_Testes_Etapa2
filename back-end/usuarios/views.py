@@ -88,7 +88,7 @@ def redefinir_senha(request, uidb64, token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
         user = User.objects.get(pk=uid)
-    except:
+    except (ValueError, UnicodeDecodeError, User.DoesNotExist):
         user = None
     if not (user and default_token_generator.check_token(user, token)):
         messages.error(request, "Link inválido ou expirado.")
@@ -142,17 +142,7 @@ def dashboard(request):
 @login_required
 def listar_transacoes(request):
     transacoes = Transacao.objects.filter(usuario=request.user).order_by('-data')
-    data = [
-        {
-            'id': t.id,
-            'data': t.data.strftime('%Y-%m-%d'),
-            'descricao': t.descricao,
-            'valor': float(t.valor),
-            'tipo': t.tipo,
-        }
-        for t in transacoes
-    ]
-    return JsonResponse({'transacoes': data})
+    return JsonResponse({'transacoes': [t.to_dict() for t in transacoes]})
 
 
 @csrf_exempt
@@ -170,17 +160,8 @@ def adicionar_transacao(request):
             tipo=body['tipo']
         )
         t.refresh_from_db()
-        return JsonResponse({
-            'status': 'ok',
-            'transacao': {
-                'id': t.id,
-                'data': t.data.strftime('%Y-%m-%d'),
-                'descricao': t.descricao,
-                'valor': float(t.valor),
-                'tipo': t.tipo,
-            }
-        })
-    except Exception as e:
+        return JsonResponse({'status': 'ok', 'transacao': t.to_dict()})
+    except (KeyError, json.JSONDecodeError, ValueError, InvalidOperation) as e:
         return JsonResponse({'error': str(e)}, status=400)
 
 
@@ -205,20 +186,7 @@ def listar_metas(request):
 @login_required
 def listar_metas_json(request):
     metas = MetaFinanceira.objects.filter(usuario=request.user).order_by('-data_criacao')
-    data = [
-        {
-            'id': m.id,
-            'nome': m.nome,
-            'valor': float(m.valor),
-            'valor_atual': float(m.valor_atual),
-            'data_inicial': m.data_inicial.strftime('%Y-%m-%d'),
-            'data_final': m.data_final.strftime('%Y-%m-%d'),
-            'status': m.status,
-            'porcentagem': float(round((m.valor_atual / m.valor) * 100, 1)) if m.valor > 0 else 0
-        }
-        for m in metas
-    ]
-    return JsonResponse({'metas': data})
+    return JsonResponse({'metas': [m.to_dict() for m in metas]})
 
 
 @csrf_exempt
@@ -251,19 +219,8 @@ def adicionar_meta(request):
         )
 
         meta.refresh_from_db()
-        return JsonResponse({
-            'status': 'ok',
-            'meta': {
-                'id': meta.id,
-                'nome': meta.nome,
-                'valor': float(meta.valor),
-                'valor_atual': float(meta.valor_atual),
-                'data_inicial': meta.data_inicial.strftime('%Y-%m-%d'),
-                'data_final': meta.data_final.strftime('%Y-%m-%d'),
-                'status': meta.status,
-            }
-        })
-    except Exception as e:
+        return JsonResponse({'status': 'ok', 'meta': meta.to_dict()})
+    except (KeyError, json.JSONDecodeError) as e:
         return JsonResponse({'error': str(e)}, status=400)
 
 
@@ -300,7 +257,7 @@ def adicionar_progresso_meta(request, meta_id):
 
     except Http404:
         raise
-    except Exception as e:
+    except (KeyError, json.JSONDecodeError) as e:
         return JsonResponse({'error': str(e)}, status=400)
 
 
@@ -320,16 +277,7 @@ def excluir_meta(request, meta_id):
 @login_required
 def listar_lembretes(request):
     lembretes = Lembrete.objects.filter(usuario=request.user).order_by('data')
-    data = [
-        {
-            'id': l.id,
-            'nome': l.nome,
-            'descricao': l.descricao,
-            'data': l.data.strftime('%Y-%m-%d'),
-        }
-        for l in lembretes
-    ]
-    return JsonResponse({'lembretes': data})
+    return JsonResponse({'lembretes': [l.to_dict() for l in lembretes]})
 
 
 @csrf_exempt
@@ -346,16 +294,8 @@ def adicionar_lembrete(request):
             data=body['data'],
         )
         l.refresh_from_db()
-        return JsonResponse({
-            'status': 'ok',
-            'lembrete': {
-                'id': l.id,
-                'nome': l.nome,
-                'descricao': l.descricao,
-                'data': l.data.strftime('%Y-%m-%d'),
-            }
-        })
-    except Exception as e:
+        return JsonResponse({'status': 'ok', 'lembrete': l.to_dict()})
+    except (KeyError, json.JSONDecodeError, ValueError, InvalidOperation) as e:
         return JsonResponse({'error': str(e)}, status=400)
 
 

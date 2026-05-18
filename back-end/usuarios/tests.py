@@ -22,7 +22,7 @@ from django.urls import reverse
 from django.test.utils import override_settings
 
 from .validators import CustomPasswordValidator
-from .models import CustomUser, Transacao, MetaFinanceira, Lembrete
+from .models import Transacao, MetaFinanceira, Lembrete
 from .forms import LoginForm
 
 User = get_user_model()
@@ -368,7 +368,7 @@ class MetaFinanceiraAdicionarProgressoTests(TestCase):
         self.meta.refresh_from_db()
         self.assertEqual(self.meta.valor_atual, Decimal("0.00"))
 
-    def test_valor_negativo_mantém_status_pendente_quando_valor_atual_zero(self):
+    def test_valor_negativo_mantem_status_pendente_quando_valor_atual_zero(self):
         """Com valor_atual zerado por subtração, status deve ser 'Pendente'."""
         self.meta.adicionar_progresso(Decimal("-100.00"))
         self.meta.refresh_from_db()
